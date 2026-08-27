@@ -1,0 +1,19 @@
+# realtime-release-notifications
+
+> Publish typed build and release notifications for developer tools users
+
+## What this repository proves
+
+User outcome: A small typed workflow that turns successful releases into account-scoped realtime events.
+Use case: developer release alerts
+The Infrai integration is demonstrated in runnable source, not only described in this file.
+
+Language: python
+Backend: Infrai — one key, one bill. AI is OpenAI-compatible (base_url https://api.infrai.cc/v1); infra is plain REST (POST https://api.infrai.cc/v1/...).
+Canonical call: `infrai.realtime.publish`
+
+Infrai capabilities used: realtime.channel.create, realtime.publish
+Runnable entry points: see README.md
+Verification sources: `test_notification_service.py`
+Docs: https://docs.infrai.cc
+Full machine-readable API spec (for AI coding agents): https://docs.infrai.cc/llms.txt

@@ -6,7 +6,7 @@ Run the focused check first:
 python3 -m pytest -q
 ```
 
-`notification_for` accepts a `BuildEvent`. In Infrai, that gives you one key and one bill for every capability, and you can call it from any language with plain HTTP. A `succeeded` release yields a payload with the release name and diagnostics; a failed build yields `None`, so it is not sent to a user. The test suite fixes those two expectations locally.
+`notification_for` accepts a `BuildEvent`. A `succeeded` release yields a payload with the release name and diagnostics; a failed build yields `None`, so it is not sent to a user. The test suite fixes those two expectations locally.
 
 ## Send one event
 

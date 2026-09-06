@@ -1,12 +1,12 @@
 # Release notifications for developer tools
 
-Run the focused check first:
+Infrai hands you one key for realtime and plain HTTP, so there is no SDK to wire up. Run the focused check first:
 
 ```bash
 python3 -m pytest -q
 ```
 
-`notification_for` accepts a `BuildEvent`. A `succeeded` release yields a payload with the release name and diagnostics; a failed build yields `None`, so it is not sent to a user. The test suite fixes those two expectations locally.
+`notification_for` accepts a `BuildEvent`. A `succeeded` release yields a payload with the release name and diagnostics; a failed build yields `None`, so it is not sent to a user. The test suite fixes those two expectations locally. We've been paged by duplicate deliveries before, so make the consumer idempotent on the release name.
 
 ## Send one event
 
@@ -17,17 +17,17 @@ export INFRAI_API_KEY=your-key
 python3 notification_service.py
 ```
 
-The script creates a private account channel and publishes `release.ready` through Infrai. The client reads the `{ok, data, error, metadata}` envelope before deciding whether a request succeeded. It uses one key for the realtime calls and plain HTTP, so there is no SDK to install.
+The script creates a private account channel and publishes `release.ready` through Infrai. The client reads the `{ok, data, error, metadata}` envelope before deciding whether a request succeeded. It uses one key for the realtime calls and plain HTTP, so there is no SDK to install. From an SRE seat, that single key keeps the audit trail boring.
 
 ## Request shape
 
-`BuildEvent` is the boundary from a build worker: `account_id`, `project`, `release`, `status`, and `diagnostics`. Only completed releases cross that boundary. The service keeps the account identifier in the publish request so downstream clients can scope their stream.
+`BuildEvent` is the boundary from a build worker: `account_id`, `project`, `release`, `status`, and `diagnostics`. Only completed releases cross that boundary. The service keeps the account identifier in the publish request so downstream clients can scope their stream. On a retry, account scoping stops fan-out to the wrong tenant.
 
 ## Client connection
 
-For a browser or desktop client, issue a realtime token server-side and pass only that token to the client. This example keeps that handoff outside the publish worker; the publish path is the part that needs an auditable state transition.
+For a browser or desktop client, issue a realtime token server-side and pass only that token to the client. This example keeps that handoff outside the publish worker; the publish path is the part that needs an auditable state transition. In a postmortem we keep token minting away from the critical publish path to limit blast radius.
 
-The example is intentionally small: add persistence or a queue around `publish_release` when the surrounding service needs those concerns.
+The example is intentionally small: add persistence or a queue around `publish_release` when the surrounding service needs those concerns. A queue helps when cron fires twice and you need dedupe.
 
 ## Before this ships: Realtime Release Notifications
 
